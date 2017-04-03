@@ -2,7 +2,7 @@
 
 export JAR=gs://hammerlab-lib/pageant-f147c5d.jar
 export MAIN=org.hammerlab.pageant.coverage.CoverageDepth
-if [ -z "$PAGEANT" ]; then
+if [ -z "$CLUSTER" ]; then
 	export CLUSTER=pageant
 fi
 "$(dirname "${BASH_SOURCE[0]}")"/../dataproc/dataproc "$@"
