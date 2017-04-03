@@ -1,13 +1,13 @@
 package org.hammerlab.pageant.coverage
 
-import org.apache.hadoop.fs.Path
 import org.apache.spark.SparkContext
 import org.hammerlab.commands.{ Args, SparkCommand }
-import org.hammerlab.genomics.readsets.args.impl.{ Arguments ⇒ ReadsetsArguments }
 import org.hammerlab.genomics.readsets.ReadSets
+import org.hammerlab.genomics.readsets.args.impl.{ Arguments ⇒ ReadsetsArguments }
 import org.hammerlab.genomics.readsets.args.path.{ UnprefixedPath, UnprefixedPathHandler, UnprefixedPathOptionHandler }
 import org.hammerlab.pageant.histogram.JointHistogram
 import org.hammerlab.pageant.histogram.JointHistogram.fromFiles
+import org.hammerlab.paths.Path
 import org.kohsuke.args4j.{ Option ⇒ Args4JOption }
 
 class Arguments
@@ -91,10 +91,7 @@ object CoverageDepth extends SparkCommand[Arguments] {
 
     val jointHistogramPath = getJointHistogramPath(args.outPath)
 
-    val jointHistogramPathExists =
-      jointHistogramPath
-        .getFileSystem(sc.hadoopConfiguration)
-        .exists(jointHistogramPath)
+    val jointHistogramPathExists = jointHistogramPath.exists
 
     val writeJointHistogram = args.writeJointHistogram
 
@@ -148,5 +145,5 @@ object CoverageDepth extends SparkCommand[Arguments] {
     }
   }
 
-  def getJointHistogramPath(dir: Path): Path = new Path(dir, "jh")
+  def getJointHistogramPath(dir: Path): Path = dir / "jh"
 }

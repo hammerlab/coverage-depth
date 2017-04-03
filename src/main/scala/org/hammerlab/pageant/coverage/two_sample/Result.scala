@@ -2,12 +2,12 @@ package org.hammerlab.pageant.coverage.two_sample
 
 import java.io.PrintWriter
 
-import org.apache.hadoop.fs.Path
 import org.hammerlab.csv._
 import org.hammerlab.pageant.coverage.CoverageDepth.getJointHistogramPath
 import org.hammerlab.pageant.histogram.JointHistogram
 import org.hammerlab.pageant.histogram.JointHistogram.Depth
 import org.hammerlab.pageant.utils.{ WriteLines, WriteRDD }
+import org.hammerlab.paths.Path
 import spire.algebra.Monoid
 
 import scala.reflect.ClassTag
@@ -28,29 +28,27 @@ abstract class Result[C: Monoid, CSVRow <: Product : TypeTag : ClassTag]
            writeFullDistributions: Boolean = false,
            writeJointHistogram: Boolean = false): this.type = {
 
-    val fs = dir.getFileSystem(jh)
-
     if (writeFullDistributions) {
-      WriteRDD(dir, s"pdf", pdf.rdd.map(toCSVRow), force, jh)
-      WriteRDD(dir, s"cdf", cdf.rdd.map(toCSVRow), force, jh)
+      WriteRDD(dir, s"pdf", pdf.rdd.map(toCSVRow), force)
+      WriteRDD(dir, s"cdf", cdf.rdd.map(toCSVRow), force)
     }
 
     if (writeJointHistogram) {
       val jhPath = getJointHistogramPath(dir)
 
-      if (fs.exists(jhPath)) {
-        fs.delete(jhPath, true)
+      if (jhPath.exists) {
+        jhPath.delete(recursive = true)
       }
 
       jh.write(jhPath)
     }
 
-    WriteLines(dir, s"pdf.csv", pdf.filtered.map(toCSVRow).toCSV(), force, jh)
-    WriteLines(dir, s"cdf.csv", cdf.filtered.map(toCSVRow).toCSV(), force, jh)
+    WriteLines(dir, s"pdf.csv", pdf.filtered.map(toCSVRow).toCSV(), force)
+    WriteLines(dir, s"cdf.csv", cdf.filtered.map(toCSVRow).toCSV(), force)
 
-    val miscPath = new Path(dir, "misc")
-    if (force || !fs.exists(miscPath)) {
-      val pw = new PrintWriter(fs.create(miscPath))
+    val miscPath = dir / "misc"
+    if (force || !miscPath.exists) {
+      val pw = new PrintWriter(miscPath.outputStream)
       writeMisc(pw)
       pw.close()
     }

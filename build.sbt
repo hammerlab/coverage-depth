@@ -16,6 +16,7 @@ deps ++= Seq(
   libs.value('htsjdk),
   libs.value('loci),
   libs.value('magic_rdds),
+  libs.value('paths),
   libs.value('readsets),
   libs.value('spark_commands),
   libs.value('spire),

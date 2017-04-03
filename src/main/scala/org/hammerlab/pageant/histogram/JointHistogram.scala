@@ -2,7 +2,6 @@ package org.hammerlab.pageant.histogram
 
 import com.esotericsoftware.kryo.Kryo
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.bdgenomics.adam.projections.{ AlignmentRecordField, FeatureField, Projection }
@@ -13,6 +12,7 @@ import org.hammerlab.genomics.reference
 import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci, Position ⇒ Pos }
 import org.hammerlab.magic.rdd.serde.SequenceFileSerializableRDD._
 import org.hammerlab.pageant.histogram.JointHistogram._
+import org.hammerlab.paths.Path
 
 import scala.collection.mutable
 import scala.collection.mutable.{ Map ⇒ MMap }
@@ -286,9 +286,6 @@ object JointHistogram {
     entries.saveCompressed(filename)
   }
 
-  def load(sc: SparkContext, fn: String): JointHistogram =
-    load(sc, new Path(fn))
-
   def load(sc: SparkContext, path: Path): JointHistogram = {
     val rdd: RDD[Record] = sc.fromSequenceFile(path)
     val jointHist: JointHist =
@@ -326,19 +323,18 @@ object JointHistogram {
       readFiles.map(
         file ⇒
           sc
-            .loadAlignments(file.toString, Some(projection))
+            .loadAlignments(file, Some(projection))
             .rdd
       )
 
     val features =
       for {
         path ← featureFiles
-        fs = path.getFileSystem(sc.hadoopConfiguration)
-        fileLength = fs.getFileStatus(path).getLen
+        fileLength = path.size
         numPartitions = (fileLength / bytesPerIntervalPartition).toInt
       } yield {
         println(s"Loading interval file $path of size $fileLength using $numPartitions")
-        sc.loadFeatures(path.toString, Some(featuresProjection), Some(numPartitions))
+        sc.loadFeatures(path, optStorageLevel = None, Some(featuresProjection), Some(numPartitions))
       }
 
     JointHistogram.fromReadsAndFeatures(reads, features, dedupeFeatureLoci)

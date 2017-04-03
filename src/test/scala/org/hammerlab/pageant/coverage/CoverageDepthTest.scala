@@ -11,7 +11,8 @@ class CoverageDepthTest extends Suite {
     check(
       "coverage.intervals.golden",
       "--intervals-file", File("intervals.bed"),
-      File("r1.sam"))
+      File("r1.sam")
+    )
   }
 
   test("one sample without intervals") {
@@ -42,7 +43,7 @@ class CoverageDepthTest extends Suite {
     val outDir = tmpDir()
     val args =
       Args4j[Arguments](
-        Array(
+        Array[String](
           "-v",
           "--out", outDir
         ) ++

@@ -1,21 +1,19 @@
 package org.hammerlab.pageant.utils
 
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
 import org.apache.spark.rdd.RDD
 import org.hammerlab.csv._
+import org.hammerlab.paths.Path
 
 import scala.reflect.runtime.universe.TypeTag
 
 object WriteRDD {
-  def apply[T <: Product : TypeTag](dir: Path, fn: String, rdd: RDD[T], force: Boolean, conf: Configuration): Unit = {
-    val path = new Path(dir, fn)
-    val fs = path.getFileSystem(conf)
+  def apply[T <: Product : TypeTag](dir: Path, fn: String, rdd: RDD[T], force: Boolean): Unit = {
+    val path = dir / fn
     val csvLines = rdd.mapPartitions(_.toCSV(includeHeaderLine = false))
-    (fs.exists(path), force) match {
+    (path.exists, force) match {
       case (true, true) ⇒
         println(s"Removing $path")
-        fs.delete(path, true)
+        path.delete(recursive = true)
         csvLines.saveAsTextFile(path.toString)
       case (true, false) ⇒
         println(s"Skipping $path, already exists")

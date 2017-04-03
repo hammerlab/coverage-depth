@@ -1,17 +1,17 @@
 package org.hammerlab.pageant.utils
 
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
+import java.io.PrintWriter
+
+import org.hammerlab.paths.Path
 
 object WriteLines {
-  def apply(dir: Path, fn: String, strs: Iterator[String], force: Boolean, conf: Configuration): Unit = {
-    val path = new Path(dir, fn)
-    val fs = path.getFileSystem(conf)
-    if (!force && fs.exists(path)) {
+  def apply(dir: Path, fn: String, strs: Iterator[String], force: Boolean): Unit = {
+    val path = dir / fn
+    if (!force && path.exists) {
       println(s"Skipping $path, already exists")
     } else {
-      val os = fs.create(path)
-      os.writeBytes(strs.mkString("", "\n", "\n"))
+      val os = new PrintWriter(path.outputStream)
+      strs.foreach(os.println)
       os.close()
     }
   }
