@@ -5,8 +5,8 @@ import org.hammerlab.commands.{ Args, SparkCommand }
 import org.hammerlab.genomics.readsets.ReadSets
 import org.hammerlab.genomics.readsets.args.impl.{ Arguments ⇒ ReadsetsArguments }
 import org.hammerlab.genomics.readsets.args.path.{ UnprefixedPath, UnprefixedPathHandler, UnprefixedPathOptionHandler }
-import org.hammerlab.pageant.histogram.JointHistogram
-import org.hammerlab.pageant.histogram.JointHistogram.fromFiles
+import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
+import org.hammerlab.pageant.histogram.JointHistogram.{ fromFiles, load }
 import org.hammerlab.paths.Path
 import org.kohsuke.args4j.{ Option ⇒ Args4JOption }
 
@@ -98,7 +98,7 @@ object CoverageDepth extends SparkCommand[Arguments] {
     val jh =
       if (!writeJointHistogram && jointHistogramPathExists) {
         println(s"Loading JointHistogram: $jointHistogramPath")
-        JointHistogram.load(sc, jointHistogramPath)
+        load(sc, jointHistogramPath)
       } else {
         println(
           s"Analyzing ${args.paths.mkString("(", ", ", ")")} ${intervalsPathStr}and writing to $outPath$forceStr"

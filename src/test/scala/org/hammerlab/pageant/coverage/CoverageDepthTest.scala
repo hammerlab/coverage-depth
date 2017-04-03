@@ -45,7 +45,7 @@ class CoverageDepthTest extends Suite {
       Args4j[Arguments](
         Array[String](
           "-v",
-          "--out", outDir
+          "--out", outDir.toString
         ) ++
           extraArgs
       )

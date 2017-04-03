@@ -4,9 +4,9 @@ import htsjdk.samtools.TextCigarCodec
 import org.bdgenomics.adam.models.{ SequenceDictionary, SequenceRecord }
 import org.bdgenomics.adam.rdd.feature.FeatureRDD
 import org.bdgenomics.formats.avro.{ AlignmentRecord, Feature }
-import org.hammerlab.genomics.reference.test.{ ClearContigNames, LenientContigNameConversions }
 import org.hammerlab.genomics.reference.test.LociConversions._
-import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci, PermissiveRegistrar }
+import org.hammerlab.genomics.reference.test.{ ClearContigNames, LenientContigNameConversions }
+import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci }
 import org.hammerlab.pageant.Suite
 import org.hammerlab.pageant.histogram.JointHistogram.{ JointHistKey, OCN, fromReadsAndFeatures }
 
@@ -15,14 +15,12 @@ class JointHistogramTest
     with LenientContigNameConversions
     with ClearContigNames {
 
-  import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
-  register(new PermissiveRegistrar)
-
   import JointHistogram.jointHistKeyOrd
 
   val sd =
     SequenceDictionary(
-      SequenceRecord("chr2", 10000000),
+      // Mix ContigNames and verify that everything still works
+      SequenceRecord("2", 10000000),
       SequenceRecord("chr11", 2000000)
     )
 

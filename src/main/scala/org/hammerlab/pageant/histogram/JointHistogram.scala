@@ -9,11 +9,13 @@ import org.bdgenomics.adam.rdd.ADAMContext._
 import org.bdgenomics.adam.rdd.feature.FeatureRDD
 import org.bdgenomics.formats.avro.AlignmentRecord
 import org.hammerlab.genomics.reference
+import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci, Position ⇒ Pos }
 import org.hammerlab.magic.rdd.serde.SequenceFileSerializableRDD._
 import org.hammerlab.pageant.histogram.JointHistogram._
 import org.hammerlab.paths.Path
 
+import scala.Array.fill
 import scala.collection.mutable
 import scala.collection.mutable.{ Map ⇒ MMap }
 
@@ -287,7 +289,7 @@ object JointHistogram {
   }
 
   def load(sc: SparkContext, path: Path): JointHistogram = {
-    val rdd: RDD[Record] = sc.fromSequenceFile(path)
+    val rdd: RDD[Record] = sc.fromSequenceFile(path.toString)
     val jointHist: JointHist =
       for {
         Record(contigOpt, depthOpts, numLoci) <- rdd
@@ -301,7 +303,7 @@ object JointHistogram {
                 readFiles: Seq[Path] = Nil,
                 featureFiles: Seq[Path] = Nil,
                 dedupeFeatureLoci: Boolean = true,
-                bytesPerIntervalPartition: Int = 1 << 16): JointHistogram = {
+                bytesPerIntervalPartition: Int = 1 << 16)(implicit factory: Factory): JointHistogram = {
 
     val projection =
       Projection(
@@ -337,10 +339,10 @@ object JointHistogram {
         sc.loadFeatures(path, optStorageLevel = None, Some(featuresProjection), Some(numPartitions))
       }
 
-    JointHistogram.fromReadsAndFeatures(reads, features, dedupeFeatureLoci)
+    fromReadsAndFeatures(reads, features, dedupeFeatureLoci)
   }
 
-  def readsToDepthMap(reads: RDD[AlignmentRecord]): DepthMap = {
+  def readsToDepthMap(reads: RDD[AlignmentRecord])(implicit factory: Factory): DepthMap = {
     val rdd = (for {
       read ← reads if read.getReadMapped
       contigName ← Option(read.getContigName).toList
@@ -355,7 +357,7 @@ object JointHistogram {
     rdd.reduceByKey(_ + _)
   }
 
-  def featuresToDepthMap(features: FeatureRDD, dedupeLoci: Boolean = true): DepthMap = {
+  def featuresToDepthMap(features: FeatureRDD, dedupeLoci: Boolean = true)(implicit factory: Factory): DepthMap = {
     val lociCounts: RDD[Pos] =
       for {
         feature <- features.rdd
@@ -379,12 +381,11 @@ object JointHistogram {
 
   def fromReadsAndFeatures(reads: Seq[RDD[AlignmentRecord]] = Nil,
                            features: Seq[FeatureRDD] = Nil,
-                           dedupeFeatureLoci: Boolean = true): JointHistogram = {
+                           dedupeFeatureLoci: Boolean = true)(implicit factory: Factory): JointHistogram =
     fromDepthMaps(
       reads.map(readsToDepthMap) ++
         features.map(featuresToDepthMap(_, dedupeFeatureLoci))
     )
-  }
 
   def sumSeqs(a: Depths, b: Depths): Depths =
     a
@@ -397,10 +398,10 @@ object JointHistogram {
 
   def oneHotOpts(num: Int, idx: Int, value: Int): Depths =
     (
-      Array.fill(idx)(Some(0)) :+
+      fill(idx)(Some(0)) :+
       Some(value)
     ) ++
-      Array.fill(num - idx - 1)(Some(0))
+      fill(num - idx - 1)(Some(0))
 
   def fromDepthMaps(rdds: Seq[DepthMap]): JointHistogram = {
     val sc = rdds.head.context
