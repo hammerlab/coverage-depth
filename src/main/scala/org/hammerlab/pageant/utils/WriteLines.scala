@@ -5,8 +5,7 @@ import java.io.PrintWriter
 import org.hammerlab.paths.Path
 
 object WriteLines {
-  def apply(dir: Path, fn: String, strs: Iterator[String], force: Boolean): Unit = {
-    val path = dir / fn
+  def apply(path: Path, strs: Iterator[String], force: Boolean): Unit =
     if (!force && path.exists) {
       println(s"Skipping $path, already exists")
     } else {
@@ -14,5 +13,4 @@ object WriteLines {
       strs.foreach(os.println)
       os.close()
     }
-  }
 }

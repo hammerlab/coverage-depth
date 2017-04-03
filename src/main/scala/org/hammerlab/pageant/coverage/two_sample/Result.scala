@@ -1,6 +1,7 @@
 package org.hammerlab.pageant.coverage.two_sample
 
 import java.io.PrintWriter
+import java.nio.file.Files
 
 import org.hammerlab.csv._
 import org.hammerlab.pageant.coverage.CoverageDepth.getJointHistogramPath
@@ -28,9 +29,13 @@ abstract class Result[C: Monoid, CSVRow <: Product : TypeTag : ClassTag]
            writeFullDistributions: Boolean = false,
            writeJointHistogram: Boolean = false): this.type = {
 
+    if (!dir.exists) {
+      Files.createDirectories(dir)
+    }
+
     if (writeFullDistributions) {
-      WriteRDD(dir, s"pdf", pdf.rdd.map(toCSVRow), force)
-      WriteRDD(dir, s"cdf", cdf.rdd.map(toCSVRow), force)
+      WriteRDD(dir / "pdf", pdf.rdd.map(toCSVRow), force)
+      WriteRDD(dir / "cdf", cdf.rdd.map(toCSVRow), force)
     }
 
     if (writeJointHistogram) {
@@ -43,8 +48,8 @@ abstract class Result[C: Monoid, CSVRow <: Product : TypeTag : ClassTag]
       jh.write(jhPath)
     }
 
-    WriteLines(dir, s"pdf.csv", pdf.filtered.map(toCSVRow).toCSV(), force)
-    WriteLines(dir, s"cdf.csv", cdf.filtered.map(toCSVRow).toCSV(), force)
+    WriteLines(dir / "pdf.csv", pdf.filtered.map(toCSVRow).toCSV(), force)
+    WriteLines(dir / "cdf.csv", cdf.filtered.map(toCSVRow).toCSV(), force)
 
     val miscPath = dir / "misc"
     if (force || !miscPath.exists) {

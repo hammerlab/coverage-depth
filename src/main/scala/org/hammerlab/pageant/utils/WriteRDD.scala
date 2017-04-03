@@ -7,8 +7,7 @@ import org.hammerlab.paths.Path
 import scala.reflect.runtime.universe.TypeTag
 
 object WriteRDD {
-  def apply[T <: Product : TypeTag](dir: Path, fn: String, rdd: RDD[T], force: Boolean): Unit = {
-    val path = dir / fn
+  def apply[T <: Product : TypeTag](path: Path, rdd: RDD[T], force: Boolean): Unit = {
     val csvLines = rdd.mapPartitions(_.toCSV(includeHeaderLine = false))
     (path.exists, force) match {
       case (true, true) ⇒
