@@ -3,6 +3,7 @@ package org.hammerlab.pageant.kryo
 import com.esotericsoftware.kryo.Kryo
 import org.apache.spark.serializer.KryoRegistrator
 import org.bdgenomics.adam.serialization.ADAMKryoRegistrator
+import org.hammerlab.genomics.reference.PermissiveRegistrar
 import org.hammerlab.magic.rdd.grid.PartialSumGridRDD
 import org.hammerlab.pageant.coverage.one_sample.with_intervals.Counts
 import org.hammerlab.pageant.coverage.two_sample.with_intervals
@@ -57,5 +58,7 @@ class Registrar extends KryoRegistrator {
     kryo.register(classOf[Array[Array[Byte]]])
 
     kryo.register(classOf[Array[Object]])
+
+    PermissiveRegistrar.registerClasses(kryo)
   }
 }
