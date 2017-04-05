@@ -345,7 +345,7 @@ object JointHistogram {
   def readsToDepthMap(reads: RDD[AlignmentRecord])(implicit factory: Factory): DepthMap = {
     val rdd = (for {
       read ← reads if read.getReadMapped
-      contigName ← Option(read.getContigName).toList
+      contigName ← Option(read.getContigName: ContigName).toList
       start ← Option(Locus(read.getStart)).toList
       end ← Option(Locus(read.getEnd)).toList
       refLen = (end - start).toInt
@@ -361,7 +361,7 @@ object JointHistogram {
     val lociCounts: RDD[Pos] =
       for {
         feature <- features.rdd
-        contigName ← Option(feature.getContigName).toList
+        contigName ← Option(feature.getContigName: ContigName).toList
         start ← Option(Locus(feature.getStart)).toList
         end ← Option(Locus(feature.getEnd)).toList
         refLen = (end - start).toInt

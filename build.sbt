@@ -8,6 +8,8 @@ sparkVersion := "2.1.0"
 scala211Only
 addSparkDeps
 
+hadoopVersion := "2.7.3"
+
 deps ++= Seq(
   libs.value('adam_core),
   libs.value('args4j),

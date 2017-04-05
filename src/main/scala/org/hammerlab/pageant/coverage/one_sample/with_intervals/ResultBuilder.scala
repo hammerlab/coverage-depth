@@ -6,7 +6,8 @@ import org.hammerlab.pageant.coverage.one_sample
 import org.hammerlab.pageant.histogram.JointHistogram
 import org.hammerlab.pageant.histogram.JointHistogram._
 
-object ResultBuilder extends one_sample.ResultBuilder[Key, Counts, Result] {
+object ResultBuilder
+  extends one_sample.ResultBuilder[Key, Counts, Result] {
 
   type DC = (Depth, Counts)
 
