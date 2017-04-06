@@ -53,7 +53,7 @@ class Arguments
     aliases = Array("-b"),
     usage = "Number of bytes per chunk of input interval-file"
   )
-  var intervalPartitionBytes: Int = 1 << 20
+  var intervalPartitionBytes: Int = 1 << 16
 
   @Args4JOption(
     name = "--persist-distributions",
