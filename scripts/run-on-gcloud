@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export JAR=gs://hammerlab-lib/pageant-f147c5d.jar
+export JAR=gs://hammerlab-lib/pageant-1ca9ed2.jar
 export MAIN=org.hammerlab.pageant.coverage.CoverageDepth
 if [ -z "$CLUSTER" ]; then
 	export CLUSTER=pageant
