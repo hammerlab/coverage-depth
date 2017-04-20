@@ -1,6 +1,7 @@
 package org.hammerlab.pageant.histogram
 
 import com.esotericsoftware.kryo.Kryo
+import grizzled.slf4j.Logging
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -12,7 +13,7 @@ import org.hammerlab.genomics.reference
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci, Position ⇒ Pos }
 import org.hammerlab.magic.rdd.serde.SequenceFileSerializableRDD._
-import org.hammerlab.pageant.histogram.JointHistogram._
+import org.hammerlab.pageant.histogram.JointHistogram.{ D, Depths, JointHist, JointHistKey, OCN }
 import org.hammerlab.paths.Path
 
 import scala.Array.fill
@@ -253,7 +254,8 @@ case class JointHistogram(jh: JointHist) {
   def write(filename: String): Unit = JointHistogram.write(jh, filename)
 }
 
-object JointHistogram {
+object JointHistogram
+  extends Logging {
 
   type B = Boolean
   type D = Double
@@ -335,7 +337,7 @@ object JointHistogram {
         fileLength = path.size
         numPartitions = (fileLength / bytesPerIntervalPartition).toInt
       } yield {
-        println(s"Loading interval file $path of size $fileLength using $numPartitions")
+        logger.info(s"Loading interval file $path of size $fileLength using $numPartitions")
         sc.loadFeatures(path, optStorageLevel = None, Some(featuresProjection), Some(numPartitions))
       }
 

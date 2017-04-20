@@ -63,7 +63,8 @@ class Arguments
   var writeFullDistributions: Boolean = false
 }
 
-object CoverageDepth extends SparkCommand[Arguments] {
+object CoverageDepth
+  extends SparkCommand[Arguments] {
 
   override def defaultRegistrar: String = "org.hammerlab.pageant.kryo.Registrar"
 
@@ -97,10 +98,10 @@ object CoverageDepth extends SparkCommand[Arguments] {
 
     val jh =
       if (!writeJointHistogram && jointHistogramPathExists) {
-        println(s"Loading JointHistogram: $jointHistogramPath")
+        logger.info(s"Loading JointHistogram: $jointHistogramPath")
         load(sc, jointHistogramPath)
       } else {
-        println(
+        logger.info(
           s"Analyzing ${args.paths.mkString("(", ", ", ")")} ${intervalsPathStr}and writing to $outPath$forceStr"
         )
         fromFiles(
