@@ -6,7 +6,7 @@ import org.hammerlab.genomics.readsets.ReadSets
 import org.hammerlab.genomics.readsets.args.impl.{ Arguments ⇒ ReadsetsArguments }
 import org.hammerlab.genomics.readsets.args.path.{ UnprefixedPath, UnprefixedPathHandler, UnprefixedPathOptionHandler }
 import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
-import org.hammerlab.pageant.histogram.JointHistogram.{ fromFiles, load }
+import org.hammerlab.pageant.histogram.JointHistogram.{ fromPaths, load }
 import org.hammerlab.paths.Path
 import org.kohsuke.args4j.{ Option ⇒ Args4JOption }
 
@@ -104,7 +104,7 @@ object CoverageDepth
         logger.info(
           s"Analyzing ${args.paths.mkString("(", ", ", ")")} ${intervalsPathStr}and writing to $outPath$forceStr"
         )
-        fromFiles(
+        fromPaths(
           sc,
           args.paths,
           intervalsFileOpt.toList,
