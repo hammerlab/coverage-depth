@@ -1,6 +1,6 @@
 import sbtassembly.PathList
 
-name := "pageant"
+name := "coverage-depth"
 version := "1.0.0-SNAPSHOT"
 
 sparkVersion := "2.1.0"
