@@ -1,5 +1,5 @@
 {
-  "name": "pageant-plots",
+  "name": "coverage-depth-plots",
   "version": "0.1.0",
   "dependencies": {
     "plotly": "^1.0.6",

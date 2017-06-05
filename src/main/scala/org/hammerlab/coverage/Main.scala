@@ -64,13 +64,14 @@ class Arguments
   var writeFullDistributions: Boolean = false
 }
 
-object CoverageDepth
+object Main
   extends SparkCommand[Arguments] {
 
   override def defaultRegistrar: String = classOf[Registrar].getName
 
   override def name: String = "coverage-depth"
-  override def description: String = "Given one or two sets of reads, and an optional set of intervals, compute a joint histogram over the reads' coverage of the genome, on and off the provided intervals."
+  override def description: String =
+    "Given one or two sets of reads, and an optional set of intervals, compute a joint histogram over the reads' coverage of the genome, on and off the provided intervals."
 
   override def run(args: Arguments, sc: SparkContext): Unit = {
 

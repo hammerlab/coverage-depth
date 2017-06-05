@@ -4,7 +4,7 @@ import org.bdgenomics.utils.cli.Args4j
 import org.hammerlab.test.matchers.files.DirMatcher.dirMatch
 import org.hammerlab.test.resources.File
 
-class CoverageDepthTest extends Suite {
+class MainTest extends Suite {
 
   test("one sample with intervals") {
     check(
@@ -49,7 +49,7 @@ class CoverageDepthTest extends Suite {
           extraArgs
       )
 
-    CoverageDepth.run(args, sc)
+    Main.run(args, sc)
 
     outDir should dirMatch(expectedDir)
   }

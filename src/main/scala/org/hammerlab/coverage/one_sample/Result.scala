@@ -4,7 +4,7 @@ import java.io.PrintWriter
 import java.nio.file.Files
 
 import org.hammerlab.csv._
-import org.hammerlab.coverage.CoverageDepth.getJointHistogramPath
+import org.hammerlab.coverage.Main.getJointHistogramPath
 import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.coverage.utils.{ WriteLines, WriteRDD }

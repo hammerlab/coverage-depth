@@ -1,7 +1,7 @@
 # coverage-depth
 Analyze coverage in a BAM file or files, optionally intersected with an "interval file" (e.g. an exome capture kit `.bed`).
 
-[![Build Status](https://travis-ci.org/hammerlab/pageant.svg?branch=master)](https://travis-ci.org/hammerlab/coverage-depth)
+[![Build Status](https://travis-ci.org/hammerlab/coverage-depth.svg?branch=master)](https://travis-ci.org/hammerlab/coverage-depth)
 [![Coverage Status](https://coveralls.io/repos/github/hammerlab/coverage-depth/badge.svg?branch=master)](https://coveralls.io/github/hammerlab/coverage-depth?branch=master)
 
 ## [`CoverageDepth`][]
