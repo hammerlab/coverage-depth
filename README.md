@@ -110,6 +110,7 @@ $ scripts/run-on-gcloud -h
 usage: dataproc [-h] [--cluster CLUSTER] [--timestamp-cluster-name]
                 [--cores CORES] [--properties PROPS_FILES] [--jar JAR]
                 [--main MAIN] [--machine-type MACHINE_TYPE] [--dry-run]
+                [--job-only]
 
 Run a Spark job on an ephemeral dataproc cluster
 
@@ -120,24 +121,27 @@ optional arguments:
   --timestamp-cluster-name, -t
                         When true, append "-<TIMESTAMP>" to the dataproc
                         cluster name
-  --cores CORES         Number of CPU cores to use
+  --cores CORES, -c CORES
+                        Number of CPU cores to use (default: 200)
   --properties PROPS_FILES, -p PROPS_FILES
                         Comma-separated list of Spark properties files; merged
                         with $SPARK_PROPS_FILES env var
   --jar JAR             URI of main app JAR; defaults to JAR env var
   --main MAIN, -m MAIN  JAR main class; defaults to MAIN env var
   --machine-type MACHINE_TYPE
-                        Machine type to use
+                        Machine type to use (default: n1-standard-4)
   --dry-run, -n         When set, print some of the parsed and inferred
                         arguments and exit without running any dataproc
                         commands
+  --job-only, -j        When set, skip cluster setup/teardown commands; just
+                        run a job
 ```
 
 It sets `$CLUSTER`, `$MAIN`, and `$JAR` by default:
 
 ```bash
-export JAR=gs://hammerlab-lib/pageant-f147c5d.jar
-export MAIN=org.hammerlab.coverage.CoverageDepth
+export JAR=gs://hammerlab-lib/coverage-depth-707fccc.jar
+export MAIN=org.hammerlab.coverage.Main
 export CLUSTER=coverage-depth
 ```
 
@@ -162,7 +166,7 @@ gcloud dataproc clusters create coverage-depth \
 gcloud dataproc jobs submit spark \
 	--cluster coverage-depth \
 	--class org.hammerlab.coverage.Main \
-	--jars gs://hammerlab-lib/pageant-c482335.jar \
+	--jars gs://hammerlab-lib/coverage-depth-707fccc.jar \
 	-- \
 	--intervals-file <path to .bed> \
 	--out <out directory> \
