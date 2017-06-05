@@ -1,10 +1,8 @@
-# pageant
-PArallel GEnomic ANalysis Toolkit
+# coverage-depth
+Analyze coverage in a BAM file or files, optionally intersected with an "interval file" (e.g. an exome capture kit `.bed`).
 
-[![Build Status](https://travis-ci.org/hammerlab/pageant.svg?branch=master)](https://travis-ci.org/hammerlab/pageant)
-[![Coverage Status](https://coveralls.io/repos/github/hammerlab/pageant/badge.svg?branch=master)](https://coveralls.io/github/hammerlab/pageant?branch=master)
-
-Currently: one tool, [`CoverageDepth`][], for analyzing coverage in a BAM file or files, optionally intersected with an "interval file" (e.g. an exome capture kit `.bed`).
+[![Build Status](https://travis-ci.org/hammerlab/pageant.svg?branch=master)](https://travis-ci.org/hammerlab/coverage-depth)
+[![Coverage Status](https://coveralls.io/repos/github/hammerlab/coverage-depth/badge.svg?branch=master)](https://coveralls.io/github/hammerlab/coverage-depth?branch=master)
 
 ## [`CoverageDepth`][]
 
@@ -15,13 +13,13 @@ When run on two samples with an interval file, it can plot the fraction of the t
 [![3-D plot preview](https://d3vv6lp55qjaqc.cloudfront.net/items/2q261q1a0U1501381n40/Screen%20Recording%202017-02-06%20at%2008.59%20AM.gif)](https://plot.ly/~ryan.blake.williams/92.embed?share_key=2XOQGkohwn5UTHEW2F3G07)
 
 ### Running Locally
-After [setting `$PAGEANT_JAR` to point to a Pageant assembly JAR](#installation):
+After [setting `$COVERAGE_JAR` to point to a coverage-depth assembly JAR](#installation):
 
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --properties-file $spark_props \
-  --class org.hammerlab.pageant.coverage.CoverageDepth \
-  $PAGEANT_JAR \
+  --class org.hammerlab.coverage.Main \
+  $COVERAGE_JAR \
   --intervals-file $intervals \
   --out $out_dir \
   $normal $tumor
@@ -39,8 +37,8 @@ A full list of arguments/options can be found by running with `-h`:
 
 ```
 $ $SPARK_HOME/bin/spark-submit \
-  --class org.hammerlab.pageant.coverage.CoverageDepth \
-  $PAGEANT_JAR \
+  --class org.hammerlab.coverage.Main \
+  $COVERAGE_JAR \
   -h
  PATHS                             : Paths to sets of reads: FILE1 FILE2 FILE3
  --dir (-d) PATH                   : When set, relative paths will be prefixed with this path (default: None)
@@ -67,12 +65,12 @@ $ $SPARK_HOME/bin/spark-submit \
 ```
 
 ### Output
-[`CoverageDepth`][] writes out a directory with a few files of note; see [this test-data for a live example](src/test/resources/coverage.intervals.golden2):
+This tool writes out a directory with a few files of note; see [this test-data for a live example](src/test/resources/coverage.intervals.golden2):
 
 - `misc`: plaintext file with high-level stats
 - `cdf.csv`: CSV with stats about the number of loci with "normal" depth ≥X and "tumor" depth ≥Y, for (X,Y) filtered to (a relatively dense set of) "round numbers".
 - `pdf.csv`: same as above, but stats are about loci with depth ==X and ==Y, resp.
-- `pdf`/`cdf`: when [`CoverageDepth`][] is run with the `--persist-distributions` (`-v`) flag, the unfiltered "pdf" and "cdf" above are written out as sharded CSVs.
+- `pdf`/`cdf`: when run with the `--persist-distributions` (`-v`) flag, the unfiltered "pdf" and "cdf" above are written out as sharded CSVs.
 
 ### Plotting
 The [`plot.js`][] script in this repo can be used to consume the `cdf.csv` produced [above](#Running) and send it to [plot.ly](https://plot.ly):
@@ -139,8 +137,8 @@ It sets `$CLUSTER`, `$MAIN`, and `$JAR` by default:
 
 ```bash
 export JAR=gs://hammerlab-lib/pageant-f147c5d.jar
-export MAIN=org.hammerlab.pageant.coverage.CoverageDepth
-export CLUSTER=pageant
+export MAIN=org.hammerlab.coverage.CoverageDepth
+export CLUSTER=coverage-depth
 ```
 
 #### Manually
@@ -151,7 +149,7 @@ You can manually run the cluster-creation, job-submission, and cluster-deletion 
 e.g. with 51 4-core nodes (2 reserved and 49 pre-emptible), pointing at a GCloud bucket with your data:
 
 ```bash
-gcloud dataproc clusters create pageant \
+gcloud dataproc clusters create coverage-depth \
 	--master-machine-type n1-standard-4 \
 	--worker-machine-type n1-standard-4 \
 	--num-workers 2 \
@@ -162,8 +160,8 @@ gcloud dataproc clusters create pageant \
 
 ```bash
 gcloud dataproc jobs submit spark \
-	--cluster pageant \
-	--class org.hammerlab.pageant.coverage.CoverageDepth \
+	--cluster coverage-depth \
+	--class org.hammerlab.coverage.Main \
 	--jars gs://hammerlab-lib/pageant-c482335.jar \
 	-- \
 	--intervals-file <path to .bed> \
@@ -172,7 +170,7 @@ gcloud dataproc jobs submit spark \
 	<path to tumor .bam>
 ```
 
-This uses a Pageant JAR that's already on GCloud storage, so that no bandwidth- or time-cost is incurred uploading a JAR.
+This uses a `coverage-depth` JAR that's already on GCloud storage, so that no bandwidth- or time-cost is incurred uploading a JAR.
 
 ##### Optional: extra Spark configs
 
@@ -191,41 +189,40 @@ or in the job-creation step:
 ##### Tear down the cluster
 
 ```bash
-gcloud dataproc clusters delete pageant
+gcloud dataproc clusters delete coverage-depth
 ```
 
 Alternatively, you can just resize it down to the minimum 2 reserved nodes:
 
 ```bash
-gcloud dataproc clusters update pageant --num-preemptible-workers 0
+gcloud dataproc clusters update coverage-depth --num-preemptible-workers 0
 ```
 
 ## Local Installation
 
-Download a pre-built assembly-JAR, and set `$PAGEANT_JAR` to point to it:
+Download a pre-built assembly-JAR, and set `$PCOVERAGE_JAR` to point to it:
 
 ```bash
-wget https://oss.sonatype.org/content/repositories/snapshots/org/hammerlab/pageant_2.11/1.0.0-SNAPSHOT/pageant_2.11-1.0.0-SNAPSHOT-assembly.jar
-export PAGEANT_JAR=$PWD/pageant_2.11-1.0.0-SNAPSHOT-assembly.jar
+wget https://oss.sonatype.org/content/repositories/snapshots/org/hammerlab/coverage-depth_2.11/1.0.0-SNAPSHOT/coverage-depth_2.11-1.0.0-SNAPSHOT-assembly.jar
+export COVERAGE_JAR=$PWD/coverage-depth_2.11-1.0.0-SNAPSHOT-assembly.jar
 ```
 
 or clone and build it yourself:
 
 ```bash
-git clone git@github.com:hammerlab/pageant.git
-cd pageant
+git clone git@github.com:hammerlab/coverage-depth.git
+cd coverage-depth
 sbt assembly
-export PAGEANT_JAR=target/scala-2.11/pageant-assembly-1.0.0-SNAPSHOT.jar
+export COVERAGE_JAR=target/scala-2.11/coverage-depth-assembly-1.0.0-SNAPSHOT.jar
 ```
 
 ### Spark Installation
-Pageant runs on Apache Spark:
+`coverage-depth` runs on Apache Spark:
 
 - [Download Spark](http://spark.apache.org/downloads.html)
 - Set `$SPARK_HOME` to the Spark installation directory
 
-Pageant currently builds against Spark 2.1.0, but some other versions will also work…
+`coverage-depth` currently builds against Spark 2.1.0, but some other versions will also work…
 
-
-[`CoverageDepth`]: src/main/scala/org/hammerlab/pageant/coverage/CoverageDepth.scala
+[`CoverageDepth`]: src/main/scala/org/hammerlab/coverage/CoverageDepth.scala
 [`plot.js`]: src/main/js/plots/plot.js
