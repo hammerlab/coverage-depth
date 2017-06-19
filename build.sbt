@@ -31,7 +31,7 @@ compileAndTestDeps += libs.value('reference)
 
 takeFirstLog4JProperties
 
-excludeFilter in Test := NothingFilter
+excludeFilter in sbt.Test := NothingFilter
 
 publishAssemblyJar
 

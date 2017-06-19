@@ -3,7 +3,7 @@ package org.hammerlab.coverage.kryo
 import com.esotericsoftware.kryo.Kryo
 import org.apache.spark.serializer.KryoRegistrator
 import org.bdgenomics.adam.serialization.ADAMKryoRegistrator
-import org.hammerlab.coverage
+import org.hammerlab.{ bam, coverage }
 import org.hammerlab.coverage.histogram.{ JointHistogram, Record }
 import org.hammerlab.coverage.one_sample
 import org.hammerlab.coverage.one_sample.with_intervals.Counts
@@ -61,5 +61,7 @@ class Registrar extends KryoRegistrator {
     kryo.register(classOf[Array[Object]])
 
     PermissiveRegistrar.registerClasses(kryo)
+
+    bam.kryo.Registrar.registerClasses(kryo)
   }
 }
