@@ -3,14 +3,15 @@ package org.hammerlab.coverage.kryo
 import com.esotericsoftware.kryo.Kryo
 import org.apache.spark.serializer.KryoRegistrator
 import org.bdgenomics.adam.serialization.ADAMKryoRegistrator
-import org.hammerlab.{ bam, coverage }
 import org.hammerlab.coverage.histogram.{ JointHistogram, Record }
 import org.hammerlab.coverage.one_sample
 import org.hammerlab.coverage.one_sample.with_intervals.Counts
 import org.hammerlab.coverage.two_sample.with_intervals
 import org.hammerlab.genomics.reference.PermissiveRegistrar
 import org.hammerlab.magic.rdd.grid.PartialSumGridRDD
+import org.hammerlab.{ bam, coverage }
 
+import scala.collection.immutable.TreeSet
 import scala.collection.mutable
 
 class Registrar extends KryoRegistrator {
@@ -62,6 +63,15 @@ class Registrar extends KryoRegistrator {
 
     PermissiveRegistrar.registerClasses(kryo)
 
-    bam.kryo.Registrar.registerClasses(kryo)
+    /**
+     * [[scala.collection.immutable.SortedSet]]s backed by [[TreeSet]]s get broadcasted in e.g.
+     * [[org.hammerlab.coverage.one_sample.ResultBuilder.make]]
+     */
+    kryo.register(classOf[TreeSet[_]])
+    kryo.register(Ordering.Int.getClass)
+    kryo.register(Class.forName("scala.collection.immutable.RedBlackTree$BlackTree"))
+    kryo.register(Class.forName("scala.collection.immutable.RedBlackTree$RedTree"))
+
+    new bam.kryo.Registrar().registerClasses(kryo)
   }
 }
