@@ -5,14 +5,17 @@ import grizzled.slf4j.Logging
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.bdgenomics.adam.projections.{ AlignmentRecordField, FeatureField, Projection }
+import org.bdgenomics.adam.converters.SAMRecordConverter
+import org.bdgenomics.adam.projections.{ FeatureField, Projection }
 import org.bdgenomics.adam.rdd.ADAMContext._
 import org.bdgenomics.adam.rdd.feature.FeatureRDD
 import org.bdgenomics.formats.avro.AlignmentRecord
+import org.hammerlab.bam.spark._
 import org.hammerlab.coverage.histogram.JointHistogram.{ D, Depths, JointHist, JointHistKey, OCN }
 import org.hammerlab.genomics.reference
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci, Position ⇒ Pos }
+import org.hammerlab.hadoop.splits.MaxSplitSize
 import org.hammerlab.magic.rdd.serde.SequenceFileSerializableRDD._
 import org.hammerlab.paths.Path
 
@@ -305,16 +308,11 @@ object JointHistogram
                 readsPaths: Seq[Path] = Nil,
                 featuresPaths: Seq[Path] = Nil,
                 dedupeFeatureLoci: Boolean = true,
-                bytesPerIntervalPartition: Int = 1 << 16)(implicit factory: Factory): JointHistogram = {
-
-    val projection =
-      Projection(
-        AlignmentRecordField.readMapped,
-        AlignmentRecordField.sequence,
-        AlignmentRecordField.contigName,
-        AlignmentRecordField.start,
-        AlignmentRecordField.cigar
-      )
+                bytesPerIntervalPartition: Int = 1 << 16)(
+      implicit
+      factory: Factory,
+      maxSplitSize: MaxSplitSize
+  ): JointHistogram = {
 
     val featuresProjection =
       Projection(
@@ -323,12 +321,17 @@ object JointHistogram
         FeatureField.end
       )
 
+    val converter = new SAMRecordConverter
+
     val reads =
       readsPaths.map(
         path ⇒
           sc
-            .loadAlignments(path, Some(projection))
-            .rdd
+            .loadReads(
+              path,
+              splitSize = maxSplitSize
+            )
+            .map(converter.convert)
       )
 
     val features =
@@ -337,7 +340,7 @@ object JointHistogram
         fileLength = path.size
         numPartitions = (fileLength / bytesPerIntervalPartition).toInt
       } yield {
-        logger.info(s"Loading interval file $path of size $fileLength using $numPartitions")
+        logger.info(s"Loading interval file $path of size $fileLength using $numPartitions partitions")
         sc.loadFeatures(path, optStorageLevel = None, Some(featuresProjection), Some(numPartitions))
       }
 

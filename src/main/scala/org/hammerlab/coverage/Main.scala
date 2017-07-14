@@ -8,6 +8,8 @@ import org.hammerlab.genomics.readsets.ReadSets
 import org.hammerlab.genomics.readsets.args.impl.{ Arguments ⇒ ReadsetsArguments }
 import org.hammerlab.genomics.readsets.args.path.{ UnprefixedPath, UnprefixedPathHandler, UnprefixedPathOptionHandler }
 import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
+import org.hammerlab.hadoop.Configuration
+import org.hammerlab.hadoop.splits.MaxSplitSize
 import org.hammerlab.paths.Path
 import org.kohsuke.args4j.{ Option ⇒ Args4JOption }
 
@@ -97,6 +99,9 @@ object Main
     val jointHistogramPathExists = jointHistogramPath.exists
 
     val writeJointHistogram = args.writeJointHistogram
+
+    implicit val conf: Configuration = sc.hadoopConfiguration
+    implicit val splitSize = MaxSplitSize(args.splitSizeOpt)
 
     val jh =
       if (!writeJointHistogram && jointHistogramPathExists) {
