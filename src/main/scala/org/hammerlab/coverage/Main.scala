@@ -77,6 +77,8 @@ object Main
 
   override def run(args: Arguments, sc: SparkContext): Unit = {
 
+    implicit val context = sc
+
     val (readsets, _) = ReadSets(sc, args)
 
     val contigLengths = readsets.contigLengths
@@ -105,14 +107,13 @@ object Main
 
     val jh =
       if (!writeJointHistogram && jointHistogramPathExists) {
-        logger.info(s"Loading JointHistogram: $jointHistogramPath")
+        info(s"Loading JointHistogram: $jointHistogramPath")
         load(sc, jointHistogramPath)
       } else {
-        logger.info(
+        info(
           s"Analyzing ${args.paths.mkString("(", ", ", ")")} ${intervalsPathStr}and writing to $outPath$forceStr"
         )
         fromPaths(
-          sc,
           args.paths,
           intervalsFileOpt.toList,
           bytesPerIntervalPartition = args.intervalPartitionBytes

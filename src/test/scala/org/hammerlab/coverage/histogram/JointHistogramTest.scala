@@ -182,8 +182,7 @@ class JointHistogramTest
     )
 
     val l: Array[(Locus, Int)] =
-      JointHistogram
-        .readsToDepthMap(reads)
+      DepthMap(reads)
         .collect()
         .map(p => (p._1.locus, p._2))
         .sortBy(_._1)

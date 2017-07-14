@@ -14,6 +14,14 @@ class MainTest extends Suite {
     )
   }
 
+  test("one sample with intervals depths-map") {
+    check(
+      "coverage.intervals.golden",
+      "--intervals-file", File("intervals.bed2"),
+      File("r1.sam")
+    )
+  }
+
   test("one sample without intervals") {
     check(
       "coverage.golden",
