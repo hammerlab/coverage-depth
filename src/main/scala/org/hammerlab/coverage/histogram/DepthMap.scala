@@ -14,9 +14,11 @@ import org.hammerlab.genomics.reference.{ ContigName, Locus, Position ⇒ Pos }
 import org.hammerlab.math.ceil
 import org.hammerlab.paths.Path
 
-case class DepthMap(rdd: DepthMap.T) {
+case class DepthMap(rdd: DepthMap.T)
+  extends Logging {
   def save(path: Path,
            codec: Class[_ <: CompressionCodec] = classOf[GzipCodec]): DepthMap = {
+    info(s"Saving DepthMap to $path")
     (
       for {
         (Pos(contigName, locus), depth) ← rdd
@@ -49,9 +51,12 @@ object DepthMap
       } yield
         Pos(contigName, start + i) → 1
 
+    implicit val ord = Pos.totalOrdering
+
     DepthMap(
       rdd
         .reduceByKey(_ + _)
+        .sortByKey()
     )
   }
 
@@ -65,6 +70,7 @@ object DepthMap
   ): DepthMap =
     path.extension match {
       case "depths" ⇒
+        info(s"Loading cached DepthMap from $path")
         DepthMap(
           sc
             .textFile(path.toString())
@@ -86,14 +92,15 @@ object DepthMap
         )
       case _ ⇒
 
-        val depthsPath = path + ".depths"
-        if (depthsPath.exists)
+        val depthsPath = path + ".depths/"
+        if (depthsPath.exists && depthsPath.list.hasNext) {
+          info("Found non-empty .depths-path; loading from that")
           apply(
             depthsPath,
             bytesPerIntervalPartition,
             dedupeLoci
           )
-        else {
+        } else {
           val featuresProjection =
             Projection(
               FeatureField.contigName,
@@ -104,16 +111,21 @@ object DepthMap
           val fileLength = path.size
           val numPartitions = ceil(fileLength, bytesPerIntervalPartition).toInt
           info(s"Loading interval file $path of size $fileLength using $numPartitions partitions")
-          apply(
-            sc.loadFeatures(
-              path,
-              optStorageLevel = None,
-              Some(featuresProjection),
-              Some(numPartitions)
-            ),
-            dedupeLoci
-          )
-          .save(depthsPath)
+          val depthsMap =
+            apply(
+              sc.loadFeatures(
+                path,
+                optStorageLevel = None,
+                Some(featuresProjection),
+                Some(numPartitions)
+              ),
+              dedupeLoci
+            )
+
+          if (writeDepths)
+            depthsMap.save(depthsPath)
+
+          depthsMap
         }
     }
 

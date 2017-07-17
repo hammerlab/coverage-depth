@@ -7,6 +7,8 @@ import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.genomics.reference.NumLoci
 import org.hammerlab.math.Steps.roundNumbers
 import spire.algebra.Monoid
+import org.hammerlab.magic.rdd.size._
+import org.hammerlab.math.ceil
 
 import scala.math.max
 import scala.reflect.ClassTag
@@ -30,13 +32,24 @@ abstract class ResultBuilder[K <: Key[C] : ClassTag : IsKey, C: Monoid : ClassTa
 
     val m = implicitly[Monoid[C]]
 
+    val depthSums =
+      keys
+        .map(
+          key ⇒
+            key.depth →
+              key.toCounts
+        )
+        .reduceByKey(m.op)
+
+    val numDepths = depthSums.size
+    val depthsPerPartition = 1000
+    val numPartitions = ceil(numDepths, depthsPerPartition).toInt
+
     val pdf: PDF[C] =
       new PDF {
         override def rdd: RDD[(Depth, C)] =
-          keys
-            .map(key ⇒ key.depth → key.toCounts)
-            .reduceByKey(m.op)
-            .sortByKey()
+          depthSums
+            .sortByKey(numPartitions = numPartitions)
       }
 
     val cdf = pdf.cdf

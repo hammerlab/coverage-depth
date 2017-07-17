@@ -7,7 +7,7 @@ import org.hammerlab.coverage.histogram.{ JointHistogram, Record }
 import org.hammerlab.coverage.one_sample
 import org.hammerlab.coverage.one_sample.with_intervals.Counts
 import org.hammerlab.coverage.two_sample.with_intervals
-import org.hammerlab.genomics.reference.PermissiveRegistrar
+import org.hammerlab.genomics.reference.{ PermissiveRegistrar, Position }
 import org.hammerlab.magic.rdd.grid.PartialSumGridRDD
 import org.hammerlab.{ bam, coverage }
 
@@ -73,5 +73,7 @@ class Registrar extends KryoRegistrator {
     kryo.register(Class.forName("scala.collection.immutable.RedBlackTree$RedTree"))
 
     new bam.kryo.Registrar().registerClasses(kryo)
+
+    kryo.register(classOf[Array[Position]])
   }
 }
