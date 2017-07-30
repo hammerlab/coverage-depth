@@ -4,7 +4,8 @@ import org.bdgenomics.utils.cli.Args4j
 import org.hammerlab.test.matchers.files.DirMatcher.dirMatch
 import org.hammerlab.test.resources.File
 
-class MainTest extends Suite {
+class MainTest
+  extends Suite {
 
   test("one sample with intervals") {
     check(

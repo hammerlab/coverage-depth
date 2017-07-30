@@ -19,7 +19,7 @@ deps ++= Seq(
   string_utils % "1.2.0-SNAPSHOT"
 )
 
-compileAndTestDeps += reference % "1.3.1-SNAPSHOT"
+compileAndTestDeps += reference % "1.4.0-SNAPSHOT"
 
 takeFirstLog4JProperties
 

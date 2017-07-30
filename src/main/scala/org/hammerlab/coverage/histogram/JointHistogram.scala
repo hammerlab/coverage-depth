@@ -406,4 +406,3 @@ object JointHistogram
   implicit def toSparkContext(jh: JointHistogram): SparkContext = jh.sc
   implicit def toHadoopConfiguration(jh: JointHistogram): Configuration = jh.sc.hadoopConfiguration
 }
-

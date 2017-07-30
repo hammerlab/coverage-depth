@@ -1,6 +1,6 @@
 package org.hammerlab.coverage.histogram
 
-import grizzled.slf4j.Logging
+import grizzled.slf4j.{ Logger, Logging }
 import org.apache.hadoop.io.compress.{ CompressionCodec, GzipCodec }
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -14,11 +14,16 @@ import org.hammerlab.genomics.reference.{ ContigName, Locus, Position ⇒ Pos }
 import org.hammerlab.math.ceil
 import org.hammerlab.paths.Path
 
-case class DepthMap(rdd: DepthMap.T)
-  extends Logging {
+case class DepthMap(rdd: DepthMap.T) {
+  /**
+   * [[Logger]] isn't [[Serializable]], so declare it here / like this, cf.
+   * https://github.com/bmc/grizzled-slf4j/issues/29.
+   */
+  @transient lazy val logger = Logger(getClass)
+
   def save(path: Path,
            codec: Class[_ <: CompressionCodec] = classOf[GzipCodec]): DepthMap = {
-    info(s"Saving DepthMap to $path")
+    logger.info(s"Saving DepthMap to $path")
     (
       for {
         (Pos(contigName, locus), depth) ← rdd
