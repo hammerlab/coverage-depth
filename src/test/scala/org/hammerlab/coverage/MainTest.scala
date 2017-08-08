@@ -56,7 +56,7 @@ class MainTest
           "--out", outDir.toString
         ) ++
           extraArgs
-      )
+      ).left.get
 
     Main.run(args, sc)
 

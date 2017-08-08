@@ -69,7 +69,7 @@ class Arguments
 object Main
   extends SparkCommand[Arguments] {
 
-  override def defaultRegistrar: String = classOf[Registrar].getName
+  override def registrar = classOf[Registrar]
 
   override def name: String = "coverage-depth"
   override def description: String =
