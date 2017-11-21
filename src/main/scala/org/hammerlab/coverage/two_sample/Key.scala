@@ -1,8 +1,8 @@
 package org.hammerlab.coverage.two_sample
 
+import cats.Monoid
 import org.hammerlab.coverage
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
-import spire.algebra.Monoid
 
 abstract class Key[C: Monoid]
   extends coverage.Key[C, (Depth, Depth)] {

@@ -1,7 +1,8 @@
 package org.hammerlab.coverage
 
+import hammerlab.path._
 import org.apache.spark.SparkContext
-import org.hammerlab.commands.{ Args, SparkCommand }
+import org.hammerlab.cli.args4j.{ Args, SparkCommand }
 import org.hammerlab.coverage.histogram.JointHistogram.{ fromPaths, load }
 import org.hammerlab.coverage.kryo.Registrar
 import org.hammerlab.genomics.readsets.ReadSets
@@ -10,7 +11,6 @@ import org.hammerlab.genomics.readsets.args.path.{ UnprefixedPath, UnprefixedPat
 import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
 import org.hammerlab.hadoop.Configuration
 import org.hammerlab.hadoop.splits.MaxSplitSize
-import org.hammerlab.paths.Path
 import org.kohsuke.args4j.{ Option ⇒ Args4JOption }
 
 class Arguments
@@ -69,7 +69,7 @@ class Arguments
 object Main
   extends SparkCommand[Arguments] {
 
-  override def registrar = classOf[Registrar]
+  registrar(Registrar())
 
   override def name: String = "coverage-depth"
   override def description: String =

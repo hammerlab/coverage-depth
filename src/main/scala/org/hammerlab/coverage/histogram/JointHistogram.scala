@@ -1,21 +1,21 @@
 package org.hammerlab.coverage.histogram
 
-import com.esotericsoftware.kryo.Kryo
 import grizzled.slf4j.Logging
+import hammerlab.path._
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.bdgenomics.adam.converters.SAMRecordConverter
 import org.bdgenomics.adam.rdd.feature.FeatureRDD
 import org.bdgenomics.formats.avro.AlignmentRecord
-import org.hammerlab.bam.spark._
 import org.hammerlab.coverage.histogram.JointHistogram.{ D, Depths, JointHist, JointHistKey, OCN }
 import org.hammerlab.genomics.reference
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci, Position ⇒ Pos }
 import org.hammerlab.hadoop.splits.MaxSplitSize
+import org.hammerlab.kryo._
 import org.hammerlab.magic.rdd.serde.SequenceFileSerializableRDD._
-import org.hammerlab.paths.Path
+import spark_bam._
 
 import scala.Array.fill
 import scala.collection.mutable
@@ -256,7 +256,8 @@ case class JointHistogram(jh: JointHist) {
 }
 
 object JointHistogram
-  extends Logging {
+  extends Registrar
+    with Logging {
 
   type B = Boolean
   type D = Double
@@ -391,17 +392,17 @@ object JointHistogram
     JointHistogram(counts)
   }
 
-  def register(kryo: Kryo): Unit = {
+  register(
     // JointHistogram.hist can broadcast an empty set.
-    kryo.register(Class.forName("scala.collection.immutable.Set$EmptySet$"))
+    "scala.collection.immutable.Set$EmptySet$",
 
     // Not necessarily serialized in the normal course, but reasonable to `collect`.
-    kryo.register(classOf[RegressionWeights])
-    kryo.register(classOf[Eigen])
-    kryo.register(classOf[mutable.ArraySeq[_]])
+    cls[RegressionWeights],
+    cls[Eigen],
+    cls[mutable.ArraySeq[_]],
 
-    new reference.Registrar().registerClasses(kryo)
-  }
+    new reference.Registrar()
+  )
 
   implicit def toSparkContext(jh: JointHistogram): SparkContext = jh.sc
   implicit def toHadoopConfiguration(jh: JointHistogram): Configuration = jh.sc.hadoopConfiguration

@@ -1,9 +1,9 @@
 package org.hammerlab.coverage.utils
 
 import grizzled.slf4j.Logging
+import hammerlab.path._
 import org.apache.spark.rdd.RDD
 import org.hammerlab.csv._
-import org.hammerlab.paths.Path
 
 import scala.reflect.runtime.universe.TypeTag
 

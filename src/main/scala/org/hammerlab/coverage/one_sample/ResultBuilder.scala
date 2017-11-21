@@ -1,13 +1,13 @@
 package org.hammerlab.coverage.one_sample
 
+import cats.Monoid
+import magic_rdds.size._
 import org.apache.spark.rdd.RDD
 import org.hammerlab.coverage.IsKey
 import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.genomics.reference.NumLoci
 import org.hammerlab.math.Steps.roundNumbers
-import spire.algebra.Monoid
-import org.hammerlab.magic.rdd.size._
 import org.hammerlab.math.ceil
 
 import scala.math.max
@@ -39,7 +39,7 @@ abstract class ResultBuilder[K <: Key[C] : ClassTag : IsKey, C: Monoid : ClassTa
             key.depth →
               key.toCounts
         )
-        .reduceByKey(m.op)
+        .reduceByKey(m.combine)
 
     val numDepths = depthSums.size
     val depthsPerPartition = 1000

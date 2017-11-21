@@ -1,10 +1,10 @@
 package org.hammerlab.coverage.two_sample
 
+import cats.Monoid
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.hammerlab.coverage
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
-import spire.algebra.Monoid
 
 import scala.collection.immutable.SortedSet
 

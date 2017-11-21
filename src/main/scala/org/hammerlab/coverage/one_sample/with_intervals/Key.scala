@@ -1,5 +1,6 @@
 package org.hammerlab.coverage.one_sample.with_intervals
 
+import hammerlab.monoid._
 import org.hammerlab.coverage.histogram.JointHistogram.{ Depth, JointHistKey }
 import org.hammerlab.coverage.{ IsKey, one_sample }
 import org.hammerlab.coverage.one_sample.Count

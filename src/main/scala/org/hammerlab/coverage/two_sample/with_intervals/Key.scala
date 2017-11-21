@@ -1,8 +1,8 @@
 package org.hammerlab.coverage.two_sample.with_intervals
 
-import org.hammerlab.coverage.two_sample
-import org.hammerlab.coverage.IsKey
+import hammerlab.monoid._
 import org.hammerlab.coverage.histogram.JointHistogram._
+import org.hammerlab.coverage.{ IsKey, two_sample }
 import org.hammerlab.coverage.two_sample.Count
 import org.hammerlab.genomics.reference.NumLoci
 

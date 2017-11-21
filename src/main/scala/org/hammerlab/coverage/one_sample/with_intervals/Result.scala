@@ -2,6 +2,7 @@ package org.hammerlab.coverage.one_sample.with_intervals
 
 import java.io.PrintWriter
 
+import hammerlab.monoid._
 import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.coverage.one_sample
