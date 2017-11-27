@@ -3,7 +3,7 @@ package org.hammerlab.coverage.utils
 import java.io.PrintWriter
 
 import grizzled.slf4j.Logging
-import org.hammerlab.paths.Path
+import hammerlab.path._
 
 object WriteLines
   extends Logging {

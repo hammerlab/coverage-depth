@@ -1,49 +1,51 @@
 package org.hammerlab.coverage.kryo
 
-import com.esotericsoftware.kryo.Kryo
-import org.apache.spark.serializer.KryoRegistrator
 import org.bdgenomics.adam.serialization.ADAMKryoRegistrator
-import org.hammerlab.coverage
 import org.hammerlab.coverage.histogram.{ JointHistogram, Record }
 import org.hammerlab.coverage.one_sample
 import org.hammerlab.coverage.one_sample.with_intervals.Counts
 import org.hammerlab.coverage.two_sample.with_intervals
-import org.hammerlab.genomics.reference.PermissiveRegistrar
-import org.hammerlab.magic.rdd.grid.PartialSumGridRDD
+import org.hammerlab.genomics.reference.{ PermissiveRegistrar, Position }
+import org.hammerlab.kryo._
+import org.hammerlab.magic.rdd.grid.{ BottomLeftElem, BottomRow, LeftCol }
+import org.hammerlab.{ bam, coverage }
 
+import scala.collection.immutable.TreeSet
 import scala.collection.mutable
 
-class Registrar extends KryoRegistrator {
-  override def registerClasses(kryo: Kryo): Unit = {
+case class Registrar() extends spark.Registrar(
 
-    kryo.register(classOf[Record])
+    cls[Record],
 
-    kryo.register(classOf[Counts])
-    kryo.register(classOf[Array[Counts]])
-    kryo.register(classOf[one_sample.Count])
+    arr[Counts],
+    cls[one_sample.Count],
 
-    kryo.register(classOf[with_intervals.Counts])
-    kryo.register(classOf[coverage.two_sample.Count])
+    cls[with_intervals.Counts],
+    cls[coverage.two_sample.Count],
 
-    kryo.register(classOf[Vector[_]])
-    kryo.register(classOf[Array[Vector[_]]])
-    kryo.register(classOf[mutable.WrappedArray.ofLong])
-    kryo.register(classOf[mutable.WrappedArray.ofByte])
-    kryo.register(classOf[mutable.WrappedArray.ofChar])
-    kryo.register(classOf[Array[Char]])
+    arr[Vector[_]],
+
+    cls[mutable.WrappedArray.ofLong],
+    cls[mutable.WrappedArray.ofByte],
+    cls[mutable.WrappedArray.ofChar],
+    cls[Array[Char]],
 
     // Tuple2[Long, Any], afaict?
     // "J" == Long (obviously). https://github.com/twitter/chill/blob/6d03f6976f33f6e2e16b8e254fead1625720c281/chill-scala/src/main/scala/com/twitter/chill/TupleSerializers.scala#L861
-    kryo.register(Class.forName("scala.Tuple2$mcJZ$sp"))
-    kryo.register(Class.forName("scala.Tuple2$mcIZ$sp"))
+    "scala.Tuple2$mcJZ$sp",
+    "scala.Tuple2$mcIZ$sp",
 
-    new ADAMKryoRegistrator().registerClasses(kryo)
+    new ADAMKryoRegistrator(),
 
-    PartialSumGridRDD.register(kryo)
-    JointHistogram.register(kryo)
+    //PartialSumGridRDD.register(kryo)
+    cls[BottomLeftElem[_]],
+    cls[BottomRow[_]],
+    cls[LeftCol[_]],
 
-    kryo.register(classOf[Array[String]])
-    kryo.register(classOf[Array[Int]])
+    JointHistogram,
+
+    cls[Array[String]],
+    cls[Array[Int]],
 
     // This seems to be necessary when serializing a RangePartitioner, which writes out a ClassTag:
     //
@@ -52,14 +54,26 @@ class Registrar extends KryoRegistrator {
     // See also:
     //
     //   https://mail-archives.apache.org/mod_mbox/spark-user/201504.mbox/%3CCAC95X6JgXQ3neXF6otj6a+F_MwJ9jbj9P-Ssw3Oqkf518_eT1w@mail.gmail.com%3E
-    kryo.register(Class.forName("scala.reflect.ClassTag$$anon$1"))
-    kryo.register(classOf[java.lang.Class[_]])
+    "scala.reflect.ClassTag$$anon$1",
+    cls[java.lang.Class[_]],
 
-    kryo.register(classOf[mutable.WrappedArray.ofRef[_]])
-    kryo.register(classOf[Array[Array[Byte]]])
+    cls[mutable.WrappedArray.ofRef[_]],
+    cls[Array[Array[Byte]]],
 
-    kryo.register(classOf[Array[Object]])
+    cls[Array[Object]],
 
-    PermissiveRegistrar.registerClasses(kryo)
-  }
-}
+    PermissiveRegistrar,
+
+    /**
+     * [[scala.collection.immutable.SortedSet]]s backed by [[TreeSet]]s get broadcasted in e.g.
+     * [[org.hammerlab.coverage.one_sample.ResultBuilder.make]]
+     */
+    cls[TreeSet[_]],
+    Ordering.Int.getClass,
+    "scala.collection.immutable.RedBlackTree$BlackTree",
+    "scala.collection.immutable.RedBlackTree$RedTree",
+
+    bam.spark.load.Registrar(),
+
+    arr[Position]
+)

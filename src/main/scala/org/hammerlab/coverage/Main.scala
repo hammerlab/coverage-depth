@@ -1,14 +1,16 @@
 package org.hammerlab.coverage
 
+import hammerlab.path._
 import org.apache.spark.SparkContext
-import org.hammerlab.commands.{ Args, SparkCommand }
+import org.hammerlab.cli.args4j.{ Args, SparkCommand }
 import org.hammerlab.coverage.histogram.JointHistogram.{ fromPaths, load }
 import org.hammerlab.coverage.kryo.Registrar
 import org.hammerlab.genomics.readsets.ReadSets
 import org.hammerlab.genomics.readsets.args.impl.{ Arguments ⇒ ReadsetsArguments }
 import org.hammerlab.genomics.readsets.args.path.{ UnprefixedPath, UnprefixedPathHandler, UnprefixedPathOptionHandler }
 import org.hammerlab.genomics.reference.ContigName.Normalization.Lenient
-import org.hammerlab.paths.Path
+import org.hammerlab.hadoop.Configuration
+import org.hammerlab.hadoop.splits.MaxSplitSize
 import org.kohsuke.args4j.{ Option ⇒ Args4JOption }
 
 class Arguments
@@ -67,13 +69,15 @@ class Arguments
 object Main
   extends SparkCommand[Arguments] {
 
-  override def defaultRegistrar: String = classOf[Registrar].getName
+  registrar(Registrar())
 
   override def name: String = "coverage-depth"
   override def description: String =
     "Given one or two sets of reads, and an optional set of intervals, compute a joint histogram over the reads' coverage of the genome, on and off the provided intervals."
 
   override def run(args: Arguments, sc: SparkContext): Unit = {
+
+    implicit val context = sc
 
     val (readsets, _) = ReadSets(sc, args)
 
@@ -98,16 +102,18 @@ object Main
 
     val writeJointHistogram = args.writeJointHistogram
 
+    implicit val conf: Configuration = sc.hadoopConfiguration
+    implicit val splitSize = MaxSplitSize(args.splitSizeOpt)
+
     val jh =
       if (!writeJointHistogram && jointHistogramPathExists) {
-        logger.info(s"Loading JointHistogram: $jointHistogramPath")
+        info(s"Loading JointHistogram: $jointHistogramPath")
         load(sc, jointHistogramPath)
       } else {
-        logger.info(
+        info(
           s"Analyzing ${args.paths.mkString("(", ", ", ")")} ${intervalsPathStr}and writing to $outPath$forceStr"
         )
         fromPaths(
-          sc,
           args.paths,
           intervalsFileOpt.toList,
           bytesPerIntervalPartition = args.intervalPartitionBytes

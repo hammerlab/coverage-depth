@@ -2,11 +2,12 @@ package org.hammerlab.coverage.one_sample.without_intervals
 
 import java.io.PrintWriter
 
+import hammerlab.monoid._
 import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
-import org.hammerlab.coverage.{ NumBP, one_sample }
 import org.hammerlab.coverage.one_sample.without_intervals.ResultBuilder.DC
 import org.hammerlab.coverage.one_sample.{ CDF, Count, PDF }
+import org.hammerlab.coverage.{ NumBP, one_sample }
 import org.hammerlab.genomics.reference.NumLoci
 
 /**

@@ -5,7 +5,7 @@ import org.bdgenomics.adam.models.{ SequenceDictionary, SequenceRecord }
 import org.bdgenomics.adam.rdd.feature.FeatureRDD
 import org.bdgenomics.formats.avro.{ AlignmentRecord, Feature }
 import org.hammerlab.coverage.Suite
-import org.hammerlab.coverage.histogram.JointHistogram.{ JointHistKey, OCN, fromReadsAndFeatures }
+import org.hammerlab.coverage.histogram.JointHistogram.{ JointHistKey, OCN, fromReadsAndFeatures, jointHistKeyOrd }
 import org.hammerlab.genomics.reference.test.LociConversions._
 import org.hammerlab.genomics.reference.test.{ ClearContigNames, LenientContigNameConversions }
 import org.hammerlab.genomics.reference.{ ContigName, Locus, NumLoci }
@@ -14,8 +14,6 @@ class JointHistogramTest
   extends Suite
     with LenientContigNameConversions
     with ClearContigNames {
-
-  import org.hammerlab.coverage.histogram.JointHistogram.jointHistKeyOrd
 
   val sd =
     SequenceDictionary(
@@ -182,8 +180,7 @@ class JointHistogramTest
     )
 
     val l: Array[(Locus, Int)] =
-      JointHistogram
-        .readsToDepthMap(reads)
+      DepthMap(reads)
         .collect()
         .map(p => (p._1.locus, p._2))
         .sortBy(_._1)

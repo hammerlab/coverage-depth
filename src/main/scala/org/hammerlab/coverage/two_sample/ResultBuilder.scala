@@ -1,13 +1,13 @@
 package org.hammerlab.coverage.two_sample
 
+import cats.Monoid
+import magic_rdds._
 import org.hammerlab.coverage.IsKey
 import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.coverage.two_sample.with_intervals.Counts
 import org.hammerlab.genomics.reference.NumLoci
-import org.hammerlab.magic.rdd.grid.PartialSumGridRDD
 import org.hammerlab.math.Steps.roundNumbers
-import spire.algebra.Monoid
 
 import scala.reflect.ClassTag
 
@@ -30,7 +30,7 @@ abstract class ResultBuilder[K <: Key[C] : ClassTag : IsKey, Result, C : ClassTa
       } yield
         key.depth → key.toCounts
 
-    val (pdfRDD, cdfRDD, maxDepth1, maxDepth2) = PartialSumGridRDD(keyedCounts)
+    val prefix_sum.Result(pdfRDD, cdfRDD, maxDepth1, maxDepth2) = keyedCounts.prefixSum2D()
 
     val d1Steps = roundNumbers(maxDepth1)
     val d2Steps = roundNumbers(maxDepth2)

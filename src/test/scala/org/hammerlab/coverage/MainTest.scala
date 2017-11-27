@@ -4,12 +4,21 @@ import org.bdgenomics.utils.cli.Args4j
 import org.hammerlab.test.matchers.files.DirMatcher.dirMatch
 import org.hammerlab.test.resources.File
 
-class MainTest extends Suite {
+class MainTest
+  extends Suite {
 
   test("one sample with intervals") {
     check(
       "coverage.intervals.golden",
       "--intervals-file", File("intervals.bed"),
+      File("r1.sam")
+    )
+  }
+
+  test("one sample with intervals depths-map") {
+    check(
+      "coverage.intervals.golden",
+      "--intervals-file", File("intervals.bed2"),
       File("r1.sam")
     )
   }
@@ -47,7 +56,7 @@ class MainTest extends Suite {
           "--out", outDir.toString
         ) ++
           extraArgs
-      )
+      ).left.get
 
     Main.run(args, sc)
 

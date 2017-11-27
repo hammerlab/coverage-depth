@@ -1,5 +1,6 @@
 package org.hammerlab.coverage.one_sample.with_intervals
 
+import hammerlab.monoid._
 import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram._
 import org.hammerlab.coverage.one_sample

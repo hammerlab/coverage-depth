@@ -1,10 +1,10 @@
 package org.hammerlab.coverage.two_sample.without_intervals
 
-import org.hammerlab.coverage.two_sample
-import org.hammerlab.coverage.IsKey
-import org.hammerlab.coverage.two_sample.Count
-import org.hammerlab.genomics.reference.NumLoci
+import hammerlab.monoid._
 import org.hammerlab.coverage.histogram.JointHistogram.{ Depth, Depths, OCN }
+import org.hammerlab.coverage.two_sample.Count
+import org.hammerlab.coverage.{ IsKey, two_sample }
+import org.hammerlab.genomics.reference.NumLoci
 
 case class Key(depth1: Depth,
                depth2: Depth,

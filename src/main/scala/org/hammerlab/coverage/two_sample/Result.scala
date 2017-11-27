@@ -3,13 +3,13 @@ package org.hammerlab.coverage.two_sample
 import java.io.PrintWriter
 import java.nio.file.Files
 
+import cats.Monoid
+import hammerlab.path._
 import org.hammerlab.coverage.Main.getJointHistogramPath
 import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.coverage.utils.{ WriteLines, WriteRDD }
 import org.hammerlab.csv._
-import org.hammerlab.paths.Path
-import spire.algebra.Monoid
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe.TypeTag

@@ -1,6 +1,6 @@
 package org.hammerlab.coverage
 
-import spire.algebra.Monoid
+import cats.Monoid
 
 abstract class Key[C: Monoid, DepthsT] {
   def depth: DepthsT
