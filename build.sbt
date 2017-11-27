@@ -15,14 +15,13 @@ deps ++= Seq(
   magic_rdds % "4.0.0",
   math % "2.1.0",
   paths % "1.4.0",
-  readsets % "1.0.6-SNAPSHOT",
+  readsets % "1.1.0",
+  reference % "1.4.0" + testtest,
   spark_util % "2.0.1",
   spire,
   string_utils % "1.2.0",
   types % "1.0.1"
 )
-
-compileAndTestDeps += reference % "1.4.0"
 
 takeFirstLog4JProperties
 
