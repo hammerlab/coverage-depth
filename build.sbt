@@ -1,26 +1,25 @@
 name := "coverage-depth"
 v"1.0.0"
 
-addSparkDeps
+spark
 
+import genomics.{ loci, readsets, reference }
 dep(
-            adam % "0.23.2",
-          args4j,
-      args4j_cli % "1.2.0",
-          args4s % "1.3.0",
-     bdg_formats,
-   bdg_utils_cli % "0.3.0",
+            adam % "0.23.4",
+     bdg.formats,
+       cli. base % "1.0.0" +testtest,
+       cli.spark % "1.0.0" +testtest,
           htsjdk,
-            loci % "2.0.1",
-      magic_rdds % "4.1.0",
-            math % "2.1.2",
-           paths % "1.4.0",
-        readsets % "1.2.0",
-       reference % "1.4.0" + testtest,
-      spark_util % "2.0.1",
+            loci % "2.2.0",
+      magic_rdds % "4.2.3",
+      math.utils % "2.2.0",
+           paths % "1.5.0",
+        readsets % "1.2.1",
+       reference % "1.5.0" + testtest,
+      spark_util % "3.0.0",
            spire,
     string_utils % "1.2.0",
-           types % "1.0.1"
+           types % "1.2.0"
 )
 
 takeFirstLog4JProperties

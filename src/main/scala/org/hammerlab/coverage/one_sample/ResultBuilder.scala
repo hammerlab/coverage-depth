@@ -1,6 +1,7 @@
 package org.hammerlab.coverage.one_sample
 
 import cats.Monoid
+import hammerlab.math.utils.ceil
 import magic_rdds.size._
 import org.apache.spark.rdd.RDD
 import org.hammerlab.coverage.IsKey
@@ -8,7 +9,6 @@ import org.hammerlab.coverage.histogram.JointHistogram
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.genomics.reference.NumLoci
 import org.hammerlab.math.Steps.roundNumbers
-import org.hammerlab.math.ceil
 
 import scala.math.max
 import scala.reflect.ClassTag
