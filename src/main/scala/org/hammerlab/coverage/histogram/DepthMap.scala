@@ -1,6 +1,7 @@
 package org.hammerlab.coverage.histogram
 
 import grizzled.slf4j.{ Logger, Logging }
+import hammerlab.math.utils.ceil
 import hammerlab.path._
 import org.apache.hadoop.io.compress.{ CompressionCodec, GzipCodec }
 import org.apache.spark.SparkContext
@@ -12,7 +13,6 @@ import org.bdgenomics.formats.avro.AlignmentRecord
 import org.hammerlab.coverage.histogram.JointHistogram.Depth
 import org.hammerlab.genomics.reference.ContigName.Factory
 import org.hammerlab.genomics.reference.{ ContigName, Locus, Position ⇒ Pos }
-import org.hammerlab.math.ceil
 
 case class DepthMap(rdd: DepthMap.T) {
   /**

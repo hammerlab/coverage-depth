@@ -64,7 +64,8 @@ class JointHistogramTest
 
     val j = fromReadsAndFeatures(List(reads1, reads2), List(features))
 
-    j.jh.collectAsMap().toMap should ===(
+    ==(
+      j.jh.collectAsMap().toMap,
       Map(
         Key("chr2", Some(1), Some(0), Some(1)) →   3,
         Key("chr2", Some(1), Some(0), Some(0)) →  10,
@@ -74,42 +75,48 @@ class JointHistogramTest
       )
     )
 
-    j.totalLoci === (
+    ==(
+      j.totalLoci,
       Map(
         Some("chr2") → 120,
         None → 120
       )
     )
 
-    j.sums.get(0, 1).collectAsMap().toMap should === (
+    ==(
+      j.sums.get(0, 1).collectAsMap().toMap,
       Map(
         Key("chr2", None, None, Some(1)) → 3.0,
         Key("chr2", None, None, Some(0)) → 10.0
       )
     )
 
-    j.sqsums.get(0, 1).collectAsMap().toMap should === (
+    ==(
+      j.sqsums.get(0, 1).collectAsMap().toMap,
       Map(
         Key("chr2", None, None, Some(1)) → 3.0,
         Key("chr2", None, None, Some(0)) → 10.0
       )
     )
 
-    j.dots.get(0, 1).collectAsMap().toMap should === (
+    ==(
+      j.dots.get(0, 1).collectAsMap().toMap,
       Map(
         Key("chr2", None, None, Some(1)) → 0.0,
         Key("chr2", None, None, Some(0)) → 0.0
       )
     )
 
-    j.ns.get(0, 1).collectAsMap().toMap should === (
+    ==(
+      j.ns.get(0, 1).collectAsMap().toMap,
       Map(
         Key("chr2", None, None, Some(1)) → 10.0,
         Key("chr2", None, None, Some(0)) → 110.0
       )
     )
 
-    j.weights(0, 1).collectAsMap().toMap should === (
+    ==(
+      j.weights(0, 1).collectAsMap().toMap,
       Map(
         Key("chr2", None, None, Some(1)) →
             (
@@ -134,7 +141,8 @@ class JointHistogramTest
       )
     )
 
-    j.eigens(0, 1).collectAsMap().toMap should === (
+    ==(
+      j.eigens(0, 1).collectAsMap().toMap,
       Map(
         Key("chr2", None, None, Some(1)) → (
           Eigen(0.33333333333333337, (0.7071067811865477, -0.7071067811865475), 0.7142857142857143),
@@ -185,7 +193,8 @@ class JointHistogramTest
         .map(p => (p._1.locus, p._2))
         .sortBy(_._1)
 
-    l should === (
+    ==(
+      l,
       Array(
         (1,1),
         (2,2),
